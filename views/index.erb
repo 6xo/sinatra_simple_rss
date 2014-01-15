@@ -1,14 +1,5 @@
 <ul>
-    <% articles = [] %>
-    <% while not @que.empty? %>
-        <% url = @que.pop(true) %>
-    <% rss = SimpleRSS.parse open(url) %>
-        <% rss.items.each do |entry| %>
-            <% article = [entry.title.force_encoding('utf-8'),entry.link] %>
-            <% articles += [article] %>
-        <% end %>
-    <% end %>
-    <% articles.each do |title,link| %>
-        <li><a href="<%= link %>"><%= title %></li>
-    <% end %>
+  <% @articles.each do |title,link| %>
+    <li><a href="<%= link %>"><%= title %></li>
+  <% end %>
 </ul>
