@@ -1,12 +1,11 @@
 require 'sinatra'
 require 'sinatra/reloader'
-require 'simple-rss'
-require 'open-uri'
+require 'rss'
 
 get '/' do
   urls = %w(
-    http://mizchi.hatenablog.com/rss
-    http://d.hatena.ne.jp/gamella/rss
+    https://www.soumu.go.jp/news.rdf
+    http://www.gsi.go.jp/index.rdf
   )
   parse(urls)
   erb :index
@@ -14,8 +13,8 @@ end
 
 get '/it' do
   urls = %w(
-    http://blog.livedoor.jp/itsoku/index.rdf
-    http://jsksokuhou.com/feed/
+    https://www.jnsa.org/rss.xml
+    http://canon-its.jp/eset/malware_info/rss/release.xml
   )
   parse(urls)
   erb :index
@@ -23,8 +22,15 @@ end
 
 def parse(urls)
   @articles = []
+  
   urls.map do |url|
-    rss = SimpleRSS.parse open(url)
+    rss = nil
+    begin
+      rss = RSS::Parser.parse(url)
+    rescue RSS::InvalidRSSError
+      rss = RSS::Parser.parse(url,false)
+    end
+    
     rss.items.each do |entry|
       @articles << [entry.title.force_encoding('utf-8'),entry.link]
     end
